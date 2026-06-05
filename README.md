@@ -133,6 +133,18 @@ pnpm install
 pnpm tauri:dev
 ```
 
+For browser-only frontend preview, run Suwayomi separately and start Vite:
+
+```bash
+VITE_MOKU_SERVER_URL=/suwayomi \
+VITE_SUWAYOMI_PROXY_TARGET=http://127.0.0.1:4567 \
+pnpm dev
+```
+
+The browser app will call `/suwayomi/api/graphql`, which Vite proxies to the
+configured Suwayomi target. Set `VITE_MOKU_SERVER_URL` to a full URL instead if
+you want the browser to call Suwayomi directly.
+
 Or with Nix:
 
 ```bash
