@@ -153,6 +153,31 @@ pnpm install
 pnpm tauri:dev
 ```
 
+### OCR and dictionary development
+
+The reader OCR overlay and dictionary popup use local helper services. To inspect
+their setup and current endpoint status:
+
+```bash
+pnpm diagnose:ocr
+```
+
+OCR setup requires `uv`; hoshidicts setup requires `cmake`, a C++23 compiler,
+and preferably `ninja`.
+
+To set them up and run them locally:
+
+```bash
+pnpm setup:ocr
+pnpm setup:hoshidicts
+pnpm ocr:dev
+pnpm dict:dev
+```
+
+`dict:dev` uses `hoshidicts-local/dictionaries` by default, but will prefer an
+existing platform dictionary root when it contains imported hoshidicts data. Set
+`MOKU_HOSHIDICTS_DATA_DIR=/path/to/Dictionaries` to choose a specific root.
+
 ---
 
 ## Stack
