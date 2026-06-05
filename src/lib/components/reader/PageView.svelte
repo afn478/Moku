@@ -4,6 +4,7 @@
   import { createPinchTracker } from "$lib/components/reader/lib/pinchZoom";
   import type { PinchTracker }  from "$lib/components/reader/lib/pinchZoom";
   import type { StripChapter }  from "$lib/components/reader/lib/scrollHandler";
+  import ReaderPageImage        from "$lib/components/reader/ReaderPageImage.svelte";
   
   interface Props {
     style:            string;
@@ -461,18 +462,15 @@
       {@const isLoaded = loadedSet.has(gi)}
       <div class="strip-slot" use:observePage={gi}>
         {#if isLoaded && src}
-          <img
+          <ReaderPageImage
             {src}
-            alt="{page.chapterName} – Page {page.localIndex + 1}"
-            data-local-page={page.localIndex + 1}
-            data-chapter={page.chapterId}
-            data-total={page.total}
-            class="{imgCls}{settingsState.settings.pageGap ? ' strip-gap' : ''}"
-            loading="eager"
-            decoding="async"
-            draggable="false"
-            onload={(e) => {
-              const img  = e.currentTarget as HTMLImageElement;
+            pageUrl={page.url}
+            alt={`${page.chapterName} - Page ${page.localIndex + 1}`}
+            localPage={page.localIndex + 1}
+            chapterId={page.chapterId}
+            total={page.total}
+            className={`${imgCls}${settingsState.settings.pageGap ? ' strip-gap' : ''}`}
+            onLoad={(img) => {
               const slot = img.closest<HTMLElement>(".strip-slot");
               if (slot && img.naturalWidth > 0) {
                 slot.style.setProperty("--aspect", String(img.naturalWidth / img.naturalHeight));
@@ -493,7 +491,13 @@
       {#await resolveUrl(readerState.pageUrls[readerState.pageNumber - 1], 999)}
         <div class="page-loader page-loader-single" aria-hidden="true">{@render skeleton()}</div>
       {:then src}
-        <img {src} alt="Page {readerState.pageNumber}" class={imgCls} decoding="async" style="opacity:{fadingOut ? 0 : 1};transition:opacity 0.1s ease" draggable="false" />
+        <ReaderPageImage
+          {src}
+          pageUrl={readerState.pageUrls[readerState.pageNumber - 1]}
+          alt={`Page ${readerState.pageNumber}`}
+          className={imgCls}
+          styleText={`opacity:${fadingOut ? 0 : 1};transition:opacity 0.1s ease`}
+        />
       {/await}
     </div>
 
@@ -505,7 +509,12 @@
             {#await resolveUrl(readerState.pageUrls[pg - 1], 999)}
               <div class="page-loader page-half {i === 0 ? 'gap-left' : 'gap-right'}" aria-hidden="true">{@render skeleton()}</div>
             {:then src}
-              <img {src} alt="Page {pg}" class="{imgCls} page-half {i === 0 ? 'gap-left' : 'gap-right'}" decoding="async" draggable="false" />
+              <ReaderPageImage
+                {src}
+                pageUrl={readerState.pageUrls[pg - 1]}
+                alt={`Page ${pg}`}
+                className={`${imgCls} page-half ${i === 0 ? 'gap-left' : 'gap-right'}`}
+              />
             {/await}
           {/each}
         </div>
@@ -521,7 +530,12 @@
       {#await resolveUrl(readerState.pageUrls[readerState.pageNumber - 1], 999)}
         <div class="page-loader page-loader-single" aria-hidden="true">{@render skeleton()}</div>
       {:then src}
-        <img {src} alt="Page {readerState.pageNumber}" class={imgCls} decoding="async" draggable="false" />
+        <ReaderPageImage
+          {src}
+          pageUrl={readerState.pageUrls[readerState.pageNumber - 1]}
+          alt={`Page ${readerState.pageNumber}`}
+          className={imgCls}
+        />
       {/await}
     </div>
   {/if}
@@ -589,8 +603,6 @@
     100% { stroke-dashoffset: -400; opacity: 0.25; }
   }
 
-  .img { display: block; user-select: none; image-rendering: auto; }
-  .img:global(.optimize-contrast) { image-rendering: -webkit-optimize-contrast; }
   :global(.fit-width)    { max-width: var(--effective-width, 100%); width: 100%; height: auto; }
   :global(.fit-height)   { max-height: calc(var(--visual-vh, 100vh) - 80px); width: auto; max-width: var(--effective-width, 100%); height: auto; }
   :global(.fit-screen)   { max-width: var(--effective-width, 100%); max-height: calc(var(--visual-vh, 100vh) - 80px); object-fit: contain; height: auto; }

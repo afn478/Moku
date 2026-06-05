@@ -7,7 +7,7 @@
     SidebarSimple,
   } from "phosphor-svelte";
   import type { ReaderSettings, ReaderPreset } from "$lib/state/reader.svelte";
-  import type { FitMode }                      from "$lib/types/settings";
+  import type { FitMode, ReaderOcrOverlayMode, ReaderOcrTextOrientation } from "$lib/types/settings";
   import { settingsState, updateSettings }     from "$lib/state/settings.svelte";
   import { readerState, PAGE_STYLES, ZOOM_MIN, ZOOM_MAX } from "$lib/state/reader.svelte";
   import { fade, fly } from "svelte/transition";
@@ -106,6 +106,17 @@
     { value: "left",  label: "Left" },
     { value: "top",   label: "Top" },
     { value: "right", label: "Right" },
+  ];
+
+  const ocrOverlayOptions: { value: ReaderOcrOverlayMode; label: string }[] = [
+    { value: "hover",  label: "Hover" },
+    { value: "always", label: "Always" },
+  ];
+
+  const ocrOrientationOptions: { value: ReaderOcrTextOrientation; label: string }[] = [
+    { value: "smart",           label: "Smart" },
+    { value: "forceHorizontal", label: "Horizontal" },
+    { value: "forceVertical",   label: "Vertical" },
   ];
 </script>
 
@@ -321,6 +332,102 @@
           aria-checked={settingsState.settings.markReadOnNext ?? true}
         ><span class="toggle-knob"></span></button>
       </label>
+    </section>
+
+    <section class="section">
+      <p class="section-label">OCR Overlay</p>
+      <label class="toggle-row">
+        <span class="toggle-label">Enable OCR overlay</span>
+        <button
+          class="toggle"
+          class:on={settingsState.settings.readerOcrEnabled ?? false}
+          onclick={() => updateSettings({ readerOcrEnabled: !(settingsState.settings.readerOcrEnabled ?? false) })}
+          role="switch"
+          aria-label="Enable OCR overlay"
+          aria-checked={settingsState.settings.readerOcrEnabled ?? false}
+        ><span class="toggle-knob"></span></button>
+      </label>
+      {#if settingsState.settings.readerOcrEnabled}
+        <label class="field-row">
+          <span class="field-label">Server URL</span>
+          <input
+            class="field-input"
+            value={settingsState.settings.readerOcrServerUrl ?? "http://127.0.0.1:3000"}
+            oninput={(e) => updateSettings({ readerOcrServerUrl: e.currentTarget.value })}
+            spellcheck="false"
+          />
+        </label>
+        <div class="mini-setting">
+          <span class="field-label">Visibility</span>
+          <div class="mini-segment">
+            {#each ocrOverlayOptions as o}
+              <button
+                class="mini-segment-btn"
+                class:active={(settingsState.settings.readerOcrOverlayMode ?? "hover") === o.value}
+                onclick={() => updateSettings({ readerOcrOverlayMode: o.value })}
+              >{o.label}</button>
+            {/each}
+          </div>
+        </div>
+        <div class="mini-setting">
+          <span class="field-label">Orientation</span>
+          <div class="mini-segment">
+            {#each ocrOrientationOptions as o}
+              <button
+                class="mini-segment-btn"
+                class:active={(settingsState.settings.readerOcrTextOrientation ?? "smart") === o.value}
+                onclick={() => updateSettings({ readerOcrTextOrientation: o.value })}
+              >{o.label}</button>
+            {/each}
+          </div>
+        </div>
+      {/if}
+    </section>
+
+    <section class="section">
+      <p class="section-label">Dictionary Lookup</p>
+      <label class="toggle-row">
+        <span class="toggle-label">Lookup OCR boxes</span>
+        <button
+          class="toggle"
+          class:on={settingsState.settings.readerDictionaryLookupEnabled ?? false}
+          onclick={() => updateSettings({ readerDictionaryLookupEnabled: !(settingsState.settings.readerDictionaryLookupEnabled ?? false) })}
+          role="switch"
+          aria-label="Lookup OCR boxes"
+          aria-checked={settingsState.settings.readerDictionaryLookupEnabled ?? false}
+        ><span class="toggle-knob"></span></button>
+      </label>
+      {#if settingsState.settings.readerDictionaryLookupEnabled}
+        <label class="field-row">
+          <span class="field-label">Server URL</span>
+          <input
+            class="field-input"
+            value={settingsState.settings.readerDictionaryServerUrl ?? "http://127.0.0.1:3031"}
+            oninput={(e) => updateSettings({ readerDictionaryServerUrl: e.currentTarget.value })}
+            spellcheck="false"
+          />
+        </label>
+        <div class="mini-setting">
+          <span class="field-label">Popup</span>
+          <div class="mini-segment">
+            <button
+              class="mini-segment-btn"
+              class:active={(settingsState.settings.readerDictionaryPopupProfile ?? "hoshi") === "hoshi"}
+              onclick={() => updateSettings({ readerDictionaryPopupProfile: "hoshi", readerDictionaryPopupWidth: 320, readerDictionaryPopupHeight: 250, readerDictionaryPopupScale: 1, readerDictionaryPopupFullWidth: false, readerDictionaryPopupActionBar: false })}
+            >Hoshi</button>
+            <button
+              class="mini-segment-btn"
+              class:active={(settingsState.settings.readerDictionaryPopupProfile ?? "hoshi") === "compact"}
+              onclick={() => updateSettings({ readerDictionaryPopupProfile: "compact", readerDictionaryPopupWidth: 280, readerDictionaryPopupHeight: 220, readerDictionaryPopupScale: 0.9, readerDictionaryPopupFullWidth: false, readerDictionaryPopupActionBar: false })}
+            >Compact</button>
+            <button
+              class="mini-segment-btn"
+              class:active={(settingsState.settings.readerDictionaryPopupProfile ?? "hoshi") === "wide"}
+              onclick={() => updateSettings({ readerDictionaryPopupProfile: "wide", readerDictionaryPopupWidth: 440, readerDictionaryPopupHeight: 320, readerDictionaryPopupScale: 1, readerDictionaryPopupFullWidth: false, readerDictionaryPopupActionBar: true })}
+            >Wide</button>
+          </div>
+        </div>
+      {/if}
     </section>
 
     {#if readerState.activeManga}
@@ -617,6 +724,61 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   }
   .toggle.on .toggle-knob { left: 16px; }
+
+  .field-row,
+  .mini-setting {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field-label {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    color: var(--text-faint);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+  }
+
+  .field-input {
+    width: 100%;
+    min-width: 0;
+    border: 1px solid var(--border-dim);
+    border-radius: var(--radius-sm);
+    background: var(--bg-raised);
+    color: var(--text-secondary);
+    font-family: var(--font-ui);
+    font-size: var(--text-xs);
+    padding: 7px 8px;
+    outline: none;
+  }
+  .field-input:focus { border-color: var(--accent-dim); color: var(--text-primary); }
+
+  .mini-segment {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-1);
+  }
+
+  .mini-setting:last-child .mini-segment {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .mini-segment-btn {
+    min-width: 0;
+    border: 1px solid var(--border-dim);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-faint);
+    font-family: var(--font-ui);
+    font-size: 10px;
+    line-height: 1;
+    padding: 8px 5px;
+    cursor: pointer;
+    transition: color var(--t-fast), background var(--t-fast), border-color var(--t-fast);
+  }
+  .mini-segment-btn:hover { color: var(--text-secondary); background: var(--bg-overlay); border-color: var(--border-base); }
+  .mini-segment-btn.active { color: var(--accent-fg); background: var(--accent-muted); border-color: var(--accent-dim); }
 
   .dir-row { display: flex; gap: var(--sp-2); }
 

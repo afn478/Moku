@@ -15,6 +15,7 @@
   import type { ReaderSettings }                             from "$lib/state/reader.svelte";
   import ReaderControls                                      from "$lib/components/reader/ReaderControls.svelte";
   import PageView                                            from "$lib/components/reader/PageView.svelte";
+  import DictionaryLookupPopup                              from "$lib/components/reader/DictionaryLookupPopup.svelte";
   import ReaderProgressBar                                   from "$lib/components/reader/ReaderProgressBar.svelte";
   import ReaderOverlay                                       from "$lib/components/reader/ReaderOverlay.svelte";
   import ReaderPresetPanel                                   from "$lib/components/reader/ReaderPresetPanel.svelte";
@@ -656,6 +657,8 @@
     onToggleUi={toggleUiVisibility}
     {bindContainer}
   />
+
+  <DictionaryLookupPopup />
 
   {#snippet progressBarSnippet()}
     <ReaderProgressBar

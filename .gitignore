@@ -1,6 +1,8 @@
 node_modules/
 suwayomi-raw/
 suwayomi-windows.zip
+ocr-server-local/
+hoshidicts-local/
 dist/
 dist-tauri/
 target/

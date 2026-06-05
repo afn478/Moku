@@ -1,12 +1,15 @@
 import { DEFAULT_KEYBINDS, type Keybinds } from '$lib/core/keybinds/defaultBinds'
 
-export type PageStyle        = 'single' | 'double' | 'longstrip'
+export type PageStyle        = 'single' | 'fade' | 'double' | 'longstrip'
 export type FitMode          = 'width' | 'height' | 'screen' | 'original'
 export type LibraryFilter    = 'all' | 'library' | 'downloaded' | string
 export type ReadingDirection = 'ltr' | 'rtl'
 export type ChapterSortDir   = 'desc' | 'asc'
 export type ChapterSortMode  = 'source' | 'chapterNumber' | 'uploadDate'
 export type ContentLevel     = 'strict' | 'moderate' | 'unrestricted'
+export type ReaderOcrOverlayMode = 'hover' | 'always'
+export type ReaderOcrTextOrientation = 'smart' | 'forceHorizontal' | 'forceVertical'
+export type ReaderDictionaryPopupProfile = 'hoshi' | 'compact' | 'wide' | 'custom'
 
 export type LibrarySortMode =
   | 'az' | 'unreadCount' | 'totalChapters'
@@ -126,6 +129,17 @@ export interface Settings {
   automationDefaults?: Partial<MangaPrefs>
   libraryShowAllInSaved?: boolean; libraryHideCompletedInSaved?: boolean
   readerContainerized?: boolean
+  readerOcrEnabled?: boolean; readerOcrServerUrl?: string
+  readerOcrOverlayMode?: ReaderOcrOverlayMode; readerOcrTextOrientation?: ReaderOcrTextOrientation
+  readerOcrFontMultiplierHorizontal?: number; readerOcrFontMultiplierVertical?: number
+  readerOcrBoxAdjustment?: number; readerOcrFocusScale?: number; readerOcrDimmedOpacity?: number
+  readerDictionaryLookupEnabled?: boolean; readerDictionaryServerUrl?: string
+  readerDictionaryLanguage?: string; readerDictionaryMaxResults?: number; readerDictionaryScanLength?: number
+  readerDictionaryPopupWidth?: number; readerDictionaryPopupHeight?: number; readerDictionaryPopupScale?: number
+  readerDictionaryPopupProfile?: ReaderDictionaryPopupProfile
+  readerDictionaryPopupActionBar?: boolean; readerDictionaryPopupFullWidth?: boolean
+  readerDictionaryPopupSwipeToDismiss?: boolean; readerDictionaryPopupSwipeThreshold?: number
+  readerDictionaryCompactGlossaries?: boolean; readerDictionaryShowExpressionTags?: boolean; readerDictionaryCompactPitchAccents?: boolean
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -162,4 +176,15 @@ export const DEFAULT_SETTINGS: Settings = {
   downloadToastsEnabled: true, downloadAutoRetry: false,
   hiddenLibraryTabs: [], libraryPinnedTabOrder: [],
   autoScroll: false, autoScrollSpeed: 5, disableAutoComplete: false,
+  readerOcrEnabled: false, readerOcrServerUrl: 'http://127.0.0.1:3000',
+  readerOcrOverlayMode: 'hover', readerOcrTextOrientation: 'smart',
+  readerOcrFontMultiplierHorizontal: 1, readerOcrFontMultiplierVertical: 1,
+  readerOcrBoxAdjustment: 4, readerOcrFocusScale: 1.12, readerOcrDimmedOpacity: 0.32,
+  readerDictionaryLookupEnabled: false, readerDictionaryServerUrl: 'http://127.0.0.1:3031',
+  readerDictionaryLanguage: 'ja', readerDictionaryMaxResults: 16, readerDictionaryScanLength: 16,
+  readerDictionaryPopupWidth: 320, readerDictionaryPopupHeight: 250, readerDictionaryPopupScale: 1,
+  readerDictionaryPopupProfile: 'hoshi',
+  readerDictionaryPopupActionBar: false, readerDictionaryPopupFullWidth: false,
+  readerDictionaryPopupSwipeToDismiss: true, readerDictionaryPopupSwipeThreshold: 30,
+  readerDictionaryCompactGlossaries: true, readerDictionaryShowExpressionTags: false, readerDictionaryCompactPitchAccents: true,
 }
